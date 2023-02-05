@@ -52,7 +52,8 @@ class MonteCarloEstimators(ABC):
     def simple_sample(self) -> npt.NDArray:
         if self.set_seed:
             np.random.seed(2023)
-        BM = np.random.normal(scale=self.T / self.n_timestamps, size=(self.n_timestamps, self.n_rep)).cumsum(axis=0)
+        # BM = np.random.normal(scale=self.T / self.n_timestamps, size=(self.n_timestamps, self.n_rep)).cumsum(axis=0)
+        BM = np.random.multivariate_normal(mean=np.zeros(self.n_timestamps), cov=self._BM_covariance(), size=self.n_rep).transpose()#.cumsum(axis=0)
         return BM
 
     def _CMC_estimator(self, Y: npt.NDArray) -> float:
@@ -140,7 +141,7 @@ class MonteCarloEstimators(ABC):
 
 
 if __name__ == "__main__":
-    MC = MonteCarloEstimators(n_rep=1000000, set_seed=False)
+    MC = MonteCarloEstimators(n_rep=1000000, set_seed=False, n_timestamps=2)
     print(MC.CrudeMonteCarlo())
     print(MC.AnthiteticMonteCarlo())
     print(MC.StratifiedMonteCarlo())
